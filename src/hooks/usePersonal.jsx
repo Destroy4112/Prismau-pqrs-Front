@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import apiQueryPersonal from "../api/apiQueryPersonal";
 import { useInstitucionContext } from "../context/InstitucionContext";
-import { createPersona, deletePersona, getPersonas, updatePersona } from "../service/PersonaService";
 
 function usePersonal() {
 
     const { institucion } = useInstitucionContext();
     const rol = useSelector(state => state.credenciales.rol.id);
-    const [listadoPersonal, setListadoPersonal] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const { createPersonalMutation, actualizarPersonalMutation, eliminarPersonalMutation,
+        personas, isCreating, isUpdating, isLoading } = apiQueryPersonal(setOpenModal);
     const [persona, setPersona] = useState({
         nombres: "",
         apellidos: "",
@@ -46,7 +46,6 @@ function usePersonal() {
 
     const toggleModal = () => {
         setOpenModal(!openModal);
-        setLoading(false);
         recargar();
     }
 
@@ -57,76 +56,26 @@ function usePersonal() {
         })
     }
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            const data = await createPersona(persona);
-            if (data.status) {
-                await consultarPersonas();
-                toggleModal();
-                toast.success("Creado con exito", { autoClose: 2000 });
-            } else {
-                data.errors.forEach(err => {
-                    toast.warn(err);
-                });
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+        createPersonalMutation(persona);
     }
-
-    /*=========== Consultar ==========================*/
-    const consultarPersonas = async () => {
-        setLoading(true);
-        try {
-            const data = await getPersonas();
-            setListadoPersonal(data);
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        consultarPersonas();
-    }, []);
 
     /*=========== Actualizar ==========================*/
 
-    const cargar = async (persona) => {
+    const cargar = (persona) => {
         setPersona({ ...persona, institucion_id: institucion.id });
         setOpenModal(true);
     }
 
-    const handleUpdate = async (e) => {
+    const handleUpdate = (e) => {
         e.preventDefault();
-        if (!persona.nombres || !persona.apellidos || !persona.tipo_documento || !persona.numero_documento || !persona.email || !persona.telefono) {
-            toast.warn('Hay campos vacios');
-            return;
-        }
-        setLoading(true);
-        try {
-            const data = await updatePersona(persona);
-            if (data.status) {
-                await consultarPersonas();
-                toggleModal();
-                toast.success("Actualizado con exito", { autoClose: 2000 });
-            } else {
-                data.errors.forEach(err => {
-                    toast.warn(err);
-                });
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+        actualizarPersonalMutation(persona);
     }
 
     /*=========== Eliminar ==========================*/
 
-    const eliminar = async (id) => {
+    const handleDelete = (id) => {
         try {
             Swal.fire({
                 title: '¿Seguro que quiere eliminar esta persona?',
@@ -136,15 +85,9 @@ function usePersonal() {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Si, eliminar',
                 cancelButtonText: 'No, cancelar'
-            }).then(async (result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
-                    const resultado = await deletePersona(id);
-                    if (resultado.status) {
-                        await consultarPersonas();
-                        toast.success("Eliminado con exito");
-                    } else {
-                        toast.error("No se pudo eleminar la Persona");
-                    }
+                    eliminarPersonalMutation(id);
                 }
             });
         } catch (error) {
@@ -154,8 +97,10 @@ function usePersonal() {
 
     return {
         tituloModal,
-        listadoPersonal,
-        loading,
+        personas,
+        isLoading,
+        isCreating,
+        isUpdating,
         openModal,
         persona,
         toggleModal,
@@ -163,7 +108,7 @@ function usePersonal() {
         handleSubmit,
         cargar,
         handleUpdate,
-        eliminar
+        handleDelete
     }
 
 

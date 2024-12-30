@@ -1,6 +1,6 @@
 import { FaCog, FaEdit, FaEnvelope, FaIdBadge, FaIdCard, FaListOl, FaPhoneAlt, FaTrashAlt } from "react-icons/fa";
 
-export const AdminsColumn = ({ cargar, eliminar }) => {
+export const AdminsColumn = ({ cargar, handleDelete }) => {
 
     return [
         {
@@ -19,7 +19,7 @@ export const AdminsColumn = ({ cargar, eliminar }) => {
                     <button onClick={() => cargar(row)} className='flex items-center justify-center rounded-full w-8 h-8 bg-blue-700 text-white hover:bg-white hover:text-blue-700 hover:border hover:border-blue-700' title='Editar'>
                         <FaEdit />
                     </button>
-                    <button onClick={() => eliminar(row.id)} className='flex items-center justify-center rounded-full w-8 h-8 bg-red-700 text-white hover:bg-white hover:text-red-700 hover:border hover:border-red-700' title='Eliminar'>
+                    <button onClick={() => handleDelete(row.id)} className='flex items-center justify-center rounded-full w-8 h-8 bg-red-700 text-white hover:bg-white hover:text-red-700 hover:border hover:border-red-700' title='Eliminar'>
                         <FaTrashAlt />
                     </button>
                 </div>

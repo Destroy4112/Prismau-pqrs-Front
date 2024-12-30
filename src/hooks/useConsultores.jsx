@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import apiQueryConsultor from "../api/apiQueryConsultor";
 import { useInstitucionContext } from "../context/InstitucionContext";
-import { createConsultor, deleteConsultor, getConsultores, updateConsultor } from "../service/ConsultoresService";
 
 function useConsultores() {
 
     const { institucion } = useInstitucionContext();
-    const [consultores, setConsultores] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const { createConsultorMutation, actualizarConsultorMutation, eliminarConsultorMutation,
+        consultores, isLoading, isCreating, isUpdating } = apiQueryConsultor(setOpenModal);
     const [consultor, setConsultor] = useState({
         nombres: "",
         apellidos: "",
@@ -46,7 +46,6 @@ function useConsultores() {
 
     const toggleModal = () => {
         setOpenModal(!openModal);
-        setLoading(false);
         recargar();
     }
 
@@ -57,73 +56,26 @@ function useConsultores() {
         })
     }
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            const data = await createConsultor(consultor);
-            if (data.status) {
-                await consultarConsultores();
-                toggleModal();
-                toast.success("Creado con exito", { autoClose: 2000 });
-            } else {
-                data.errors.forEach(err => {
-                    toast.warn(err);
-                })
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+        createConsultorMutation(consultor);
     }
-
-    /*=========== Consultar ==========================*/
-    const consultarConsultores = async () => {
-        setLoading(true);
-        try {
-            const data = await getConsultores();
-            setConsultores(data);
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        consultarConsultores();
-    }, []);
 
     /*=========== Actualizar ==========================*/
 
-    const cargar = async (consultor) => {
+    const cargar = (consultor) => {
         setConsultor(consultor);
         setOpenModal(true);
     }
 
-    const handleUpdate = async (e) => {
+    const handleUpdate = (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            const data = await updateConsultor(consultor);
-            if (data.status) {
-                await consultarConsultores();
-                toggleModal();
-                toast.success("Actualizado con exito", { autoClose: 2000 });
-            } else {
-                data.errors.forEach(err => {
-                    toast.warn(err);
-                })
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message);
-        }
-        setLoading(false);
+        actualizarConsultorMutation(consultor);
     }
 
     /*=========== Eliminar ==========================*/
 
-    const eliminar = async (id) => {
+    const handleDelete = (id) => {
         try {
             Swal.fire({
                 title: '¿Seguro que quiere eliminar esta consultor?',
@@ -133,15 +85,9 @@ function useConsultores() {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Si, eliminar',
                 cancelButtonText: 'No, cancelar'
-            }).then(async (result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
-                    const resultado = await deleteConsultor(id);
-                    if (resultado.status) {
-                        await consultarConsultores();
-                        toast.success("Eliminado con exito");
-                    } else {
-                        toast.error("No se pudo eleminar el consultor");
-                    }
+                    eliminarConsultorMutation(id);
                 }
             });
         } catch (error) {
@@ -152,7 +98,9 @@ function useConsultores() {
     return {
         tituloModal,
         consultores,
-        loading,
+        isLoading,
+        isCreating,
+        isUpdating,
         openModal,
         consultor,
         toggleModal,
@@ -160,7 +108,7 @@ function useConsultores() {
         handleSubmit,
         cargar,
         handleUpdate,
-        eliminar
+        handleDelete
     }
 
 

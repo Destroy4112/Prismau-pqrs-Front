@@ -1,6 +1,6 @@
 import { FaCog, FaCogs, FaEdit, FaListOl, FaTrashAlt } from "react-icons/fa";
 
-export const RolesColumn = ({ cargar, eliminar }) => {
+export const RolesColumn = ({ cargar, handleDelete }) => {
 
     return [
 
@@ -25,7 +25,7 @@ export const RolesColumn = ({ cargar, eliminar }) => {
                     <button onClick={() => cargar(row)} className='flex items-center justify-center rounded-full w-8 h-8 bg-blue-700 text-white hover:bg-white hover:text-blue-700 hover:border hover:border-blue-700' title='Editar'>
                         <FaEdit />
                     </button>
-                    <button onClick={() => eliminar(row.id)} className='flex items-center justify-center rounded-full w-8 h-8 bg-red-700 text-white hover:bg-white hover:text-red-700 hover:border hover:border-red-700' title='Eliminar'>
+                    <button onClick={() => handleDelete(row.id)} className='flex items-center justify-center rounded-full w-8 h-8 bg-red-700 text-white hover:bg-white hover:text-red-700 hover:border hover:border-red-700' title='Eliminar'>
                         <FaTrashAlt />
                     </button>
                 </div>

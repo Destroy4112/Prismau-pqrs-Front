@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import { createRol, deleteRol, getRoles, updateRol } from "../service/RolesService";
+import apiQueryRol from "../api/apiQueryRol";
 
 function useRoles() {
 
-    const [roles, setRoles] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const { createRolMutation, actualizarRolMutation, eliminarRolMutation, roles, isLoading, isCreating, isUpdating } = apiQueryRol(setOpenModal);
     const [rol, setRol] = useState({
         descripcion: '',
     });
@@ -35,76 +34,26 @@ function useRoles() {
         })
     }
 
-    const handleSubmit = async (e) => {
+    const handleCreate = (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            const data = await createRol(rol);
-            if (data.status) {
-                await consultarRoles();
-                toggleModal();
-                toast.success("Creado con exito", { autoClose: 2000 });
-            } else {
-                data.errors.forEach(err => {
-                    toast.warn(err);
-                });
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+        createRolMutation(rol);
     }
-
-    /*=========== Consultar ==========================*/
-    const consultarRoles = async () => {
-        setLoading(true);
-        try {
-            const data = await getRoles();
-            setRoles(data);
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        consultarRoles();
-    }, []);
 
     /*=========== Actualizar ==========================*/
 
-    const cargar = async (rol) => {
+    const cargar = (rol) => {
         setRol(rol);
         setOpenModal(true);
     }
 
-    const handleUpdate = async (e) => {
+    const handleUpdate = (e) => {
         e.preventDefault();
-        if (!rol.descripcion) {
-            toast.warn('Hay campos vacios');
-            return;
-        }
-        setLoading(true);
-        try {
-            const data = await updateRol(rol);
-            if (data.status) {
-                await consultarRoles();
-                toggleModal();
-                toast.success("Actualizado con exito", { autoClose: 2000 });
-            } else {
-                data.errors.forEach(err => {
-                    toast.warn(err);
-                });
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+        actualizarRolMutation(rol);
     }
 
     /*=========== Eliminar ==========================*/
 
-    const eliminar = async (id) => {
+    const handleDelete = (id) => {
         try {
             Swal.fire({
                 title: '¿Seguro que quiere eliminar este rol?',
@@ -114,17 +63,9 @@ function useRoles() {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Si, eliminar',
                 cancelButtonText: 'No, cancelar'
-            }).then(async (result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
-                    const resultado = await deleteRol(id);
-                    if (resultado.status) {
-                        await consultarRoles();
-                        toast.success("Eliminado con exito");
-                    } else {
-                        resultado.errors.forEach(err => {
-                            toast.warn(err);
-                        });
-                    }
+                    eliminarRolMutation(id);
                 }
             });
         } catch (error) {
@@ -133,17 +74,19 @@ function useRoles() {
     }
 
     return {
-        tituloModal,
-        roles,
-        loading,
-        openModal,
         rol,
+        roles,
+        isLoading,
+        isCreating,
+        isUpdating,
+        openModal,
+        tituloModal,
         toggleModal,
         handleChange,
-        handleSubmit,
+        handleCreate,
         cargar,
         handleUpdate,
-        eliminar
+        handleDelete
     }
 
 

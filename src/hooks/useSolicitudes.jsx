@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { PrivateRoutes, RouteBackFile } from "../models/RoutesModel";
-import { asignPersonaSolicitud, cambiarPrioridad, createSolicitud, getSolicitudesConsultor, getSolicitudesInstitucion, getSolicitudesPersona, responderSolicitud, updateSolicitud } from "../service/SolicitudesService";
+import apiQuerySolicitud from "../api/apiQuerySolicitud";
+import { RouteBackFile } from "../models/RoutesModel";
 
 export default function useSolicitudes() {
 
-    const navigate = useNavigate();
-    const institucion = useSelector(state => state.institucion);
     const user = useSelector(state => state.credenciales);
-    const usuario = useSelector(state => state.user);
-    const [loading, setLoading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
-    const [solicitudes, setSolicitudes] = useState([]);
+    const { createSolicitudMutation, actualizarSolicitudMutation, prioridadSolicitudMutation, responsableSolicitudMutation,
+        responderSolicitudMutation, isLoading, isCreating, isUpdating, solicitudes, isChangingPriority, isAsigning, isResponding
+    } = apiQuerySolicitud(setOpenModal);
     const [fileUrl, setFileUrl] = useState('');
     const [busqueda, setBusqueda] = useState("");
     const [puedeResponder, setPuedeResponder] = useState(false);
@@ -37,7 +33,6 @@ export default function useSolicitudes() {
     }, [solicitud.archivo]);
 
     const recargar = () => {
-        setLoading(false);
         setSolicitud({
             tipo: "",
             descripcion: "",
@@ -71,61 +66,17 @@ export default function useSolicitudes() {
         })
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            if (!solicitud.tipo || !solicitud.descripcion || !solicitud.prioridad) {
-                toast.warn('Hay campos vacios');
-                return;
-            }
-            const formData = new FormData();
-            formData.append("tipo", solicitud.tipo);
-            formData.append("descripcion", solicitud.descripcion);
-            formData.append("prioridad", solicitud.prioridad);
-            formData.append("archivo", solicitud.archivo);
-            formData.append("estado", solicitud.estado);
-            formData.append("usuario", user.id);
-            const res = await createSolicitud(formData);
-            if (res.status) {
-                await getSolicitudes();
-                toggleModal();
-                toast.success("Creado con exito", { autoClose: 2000 });
-                recargar();
-            } else {
-                res.errors.forEach(err => {
-                    toast.warn(err);
-                })
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+        const formData = new FormData();
+        formData.append("tipo", solicitud.tipo);
+        formData.append("descripcion", solicitud.descripcion);
+        formData.append("prioridad", solicitud.prioridad);
+        formData.append("archivo", solicitud.archivo);
+        formData.append("estado", solicitud.estado);
+        formData.append("usuario", user.id);
+        createSolicitudMutation(formData)
     }
-
-    /*================= CONSULTAR ============================== */
-
-    const getSolicitudes = async () => {
-        setLoading(true);
-        let res;
-        try {
-            if (user.rol.id == 3) {
-                res = await getSolicitudesInstitucion(institucion.id);
-            } else if (user.rol.id == 4) {
-                res = await getSolicitudesConsultor(usuario.id);
-            } else {
-                res = await getSolicitudesPersona(usuario.id);
-            }
-            setSolicitudes(res);
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        getSolicitudes();
-    }, [])
 
     /*================= Buscar ============================== */
 
@@ -157,26 +108,9 @@ export default function useSolicitudes() {
 
     /*================= Asignar responsable ============================== */
 
-    const handleAsignar = async () => {
-        setLoading(true);
-        if (!solicitud.persona || solicitud.persona == 0) {
-            toast.warn('Debe seleccionar una persona');
-            return;
-        }
-        try {
-            const res = await asignPersonaSolicitud(solicitud);
-            if (res.status) {
-                navigate(PrivateRoutes.SOLICITUDES);
-                toast.success("Asignado con exito", { autoClose: 2000 });
-            } else {
-                res.errors.forEach(err => {
-                    toast.warn(err);
-                })
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+    const handleAsignar = (e) => {
+        e.preventDefault();
+        responsableSolicitudMutation(solicitud);
     }
 
     /*================= Responder solicitud ============================== */
@@ -185,46 +119,16 @@ export default function useSolicitudes() {
         setPuedeResponder(!puedeResponder);
     };
 
-    const responder = async () => {
-        if (!solicitud.respuesta) {
-            toast.warn('Debe escribir una respuesta');
-            return;
-        }
-        setLoading(true);
-        try {
-            const res = await responderSolicitud(solicitud);
-            if (res.status) {
-                navigate(PrivateRoutes.SOLICITUDES);
-                toast.success("Respondido con exito", { autoClose: 2000 });
-            } else {
-                res.errors.forEach(err => {
-                    toast.warn(err);
-                })
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+    const responder = (e) => {
+        e.preventDefault();
+        responderSolicitudMutation(solicitud);
     }
 
     /*================= Cambiar prioridad ============================== */
 
-    const changePrioridad = async () => {
-        setLoading(true);
-        try {
-            const res = await cambiarPrioridad(solicitud);
-            if (res.status) {
-                navigate(PrivateRoutes.SOLICITUDES);
-                toast.success("Prioridad cambiada con exito", { autoClose: 2000 });
-            } else {
-                res.errors.forEach(err => {
-                    toast.warn(err);
-                })
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+    const changePrioridad = (e) => {
+        e.preventDefault();
+        prioridadSolicitudMutation(solicitud);
     }
 
     //================= Actualizar ==============================
@@ -234,39 +138,26 @@ export default function useSolicitudes() {
         setOpenModal(true);
     }
 
-    const actualizar = async () => {
-        setLoading(true);
-        try {
-            if (!solicitud.tipo || !solicitud.descripcion || !solicitud.prioridad) {
-                toast.warn('Hay campos vacios');
-                return;
-            }
-            const formData = new FormData();
-            formData.append("tipo", solicitud.tipo);
-            formData.append("descripcion", solicitud.descripcion);
-            formData.append("prioridad", solicitud.prioridad);
-            formData.append("archivo", solicitud.archivo);
-            formData.append("estado", solicitud.estado);
-            formData.append("usuario", user.id);
-            const res = await updateSolicitud(solicitud.id, formData);
-            if (res.status) {
-                await getSolicitudes();
-                setOpenModal(false);
-                toast.success("Actualizado con exito", { autoClose: 2000 });
-            } else {
-                res.errors.forEach(err => {
-                    toast.warn(err);
-                })
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+    const handleUpdate = (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("tipo", solicitud.tipo);
+        formData.append("descripcion", solicitud.descripcion);
+        formData.append("prioridad", solicitud.prioridad);
+        formData.append("archivo", solicitud.archivo);
+        formData.append("estado", solicitud.estado);
+        formData.append("usuario", user.id);
+        actualizarSolicitudMutation({ id: solicitud.id, solicitud: formData })
     }
 
     return {
         lista,
-        loading,
+        isLoading,
+        isCreating,
+        isUpdating,
+        isChangingPriority,
+        isAsigning,
+        isResponding,
         openModal,
         tituloModal,
         solicitud,
@@ -284,6 +175,6 @@ export default function useSolicitudes() {
         responder,
         changePrioridad,
         cargar,
-        actualizar
+        handleUpdate
     }
 }

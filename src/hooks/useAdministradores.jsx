@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import apiQueryAdministrador from "../api/apiQueryAdministrador";
 import { useInstitucionContext } from "../context/InstitucionContext";
-import { createAdministrador, deleteAdministrador, getAdministradoresInstitucion, updateAdministrador } from "../service/AdministradoresService";
 
 function useAdministradores() {
 
     const { institucion } = useInstitucionContext();
-    const [administradores, setAdministradores] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const { createAdministradorMutation, actualizarAdministradorMutation, eliminarAdministradorMutation,
+        administradores, isLoading, isCreating, isUpdating } = apiQueryAdministrador(setOpenModal);
     const [administrador, setAdministrador] = useState({
         nombres: "",
         apellidos: "",
@@ -24,7 +24,7 @@ function useAdministradores() {
     const tituloModal = administrador.id ? 'Editar administrador' : 'Crear administrador';
 
 
-    /*=========== Crear ==============================*/
+    /*=========== Recargar ==============================*/
 
     const recargar = () => {
         setAdministrador({
@@ -44,7 +44,6 @@ function useAdministradores() {
 
     const toggleModal = () => {
         setOpenModal(!openModal);
-        setLoading(false);
         recargar();
     }
 
@@ -55,79 +54,26 @@ function useAdministradores() {
         })
     }
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            const data = await createAdministrador(administrador);
-            if (data.status) {
-                await consultarAdministradores();
-                toggleModal();
-                toast.success("Creado con exito", { autoClose: 2000 });
-            } else {
-                data.errors.forEach(err => {
-                    toast.warn(err);
-                });
-            }
-        } catch (error) {
-            console.log(error);
-            
-            toast.error(error.message);
-        } finally {
-            setLoading(false);
-        }
+        createAdministradorMutation(administrador);
     }
-
-    /*=========== Consultar ==========================*/
-    const consultarAdministradores = async () => {
-        setLoading(true);
-        try {
-            const data = await getAdministradoresInstitucion(institucion.id);
-            setAdministradores(data);
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        consultarAdministradores();
-    }, []);
 
     /*=========== Actualizar ==========================*/
 
-    const cargar = async (administrador) => {
+    const cargar = (administrador) => {
         setAdministrador({ ...administrador, institucion_id: institucion.id });
         setOpenModal(true);
     }
 
-    const handleUpdate = async (e) => {
+    const handleUpdate = (e) => {
         e.preventDefault();
-        if (!administrador.nombres || !administrador.apellidos || !administrador.tipo_documento || !administrador.numero_documento || !administrador.email || !administrador.telefono) {
-            toast.warn('Hay campos vacios');
-            return;
-        }
-        setLoading(true);
-        try {
-            const data = await updateAdministrador(administrador);
-            if (data.status) {
-                await consultarAdministradores();
-                toggleModal();
-                toast.success("Actualizado con exito", { autoClose: 2000 });
-            } else {
-                data.errors.forEach(err => {
-                    toast.warn(err);
-                });
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-        setLoading(false);
+        actualizarAdministradorMutation(administrador);
     }
 
     /*=========== Eliminar ==========================*/
 
-    const eliminar = async (id) => {
+    const handleDelete = (id) => {
         try {
             Swal.fire({
                 title: '¿Seguro que quiere eliminar esta administrador?',
@@ -137,15 +83,9 @@ function useAdministradores() {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Si, eliminar',
                 cancelButtonText: 'No, cancelar'
-            }).then(async (result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
-                    const resultado = await deleteAdministrador(id);
-                    if (resultado.status) {
-                        await consultarAdministradores();
-                        toast.success("Eliminado con exito");
-                    } else {
-                        toast.error("No se pudo eleminar el administrador");
-                    }
+                    eliminarAdministradorMutation(id);
                 }
             });
         } catch (error) {
@@ -156,15 +96,17 @@ function useAdministradores() {
     return {
         tituloModal,
         administradores,
-        loading,
         openModal,
         administrador,
+        isLoading,
+        isCreating,
+        isUpdating,
         toggleModal,
         handleChange,
         handleSubmit,
         cargar,
         handleUpdate,
-        eliminar
+        handleDelete
     }
 
 

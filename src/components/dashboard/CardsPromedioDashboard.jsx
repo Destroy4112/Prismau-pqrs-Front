@@ -1,9 +1,8 @@
-import React from 'react'
-import useCantidad from '../../hooks/useCantidad'
+import React from 'react';
+import apiQueryCantidad from '../../api/apiQueryCantidad';
 
-export default function CardsPromedioDashboard() {
+export default function CardsPromedioDashboard({ promedio }) {
 
-    const { promedio } = useCantidad();
     const card = { color: "blue-500", titulo: "Promedio de respuesta", valor: promedio, icono: "tachometer-alt" };
 
     return (

@@ -10,15 +10,16 @@ import VentanaModal from '../../../utils/modals/VentanaModal';
 export default function SolicitudesPage() {
 
   const rol = useSelector(state => state.credenciales.rol.id);
-  const { lista, loading, openModal, solicitud, tituloModal, busqueda,
-    handleChange, handleChangeImagen, toggleModal, handleSubmit, handleBusqueda, cargar, actualizar } = useSolicitudes();
+  const { lista, isLoading, isCreating, isUpdating, openModal, solicitud, tituloModal, busqueda,
+    handleChange, handleChangeImagen, toggleModal, handleSubmit, handleBusqueda, cargar, handleUpdate } = useSolicitudes();
   const columns = SolicitudesColumn({ rol, cargar });
-  const handler = solicitud.id ? actualizar : handleSubmit;
+  const handler = solicitud.id ? handleUpdate : handleSubmit;
+  const loading = solicitud.id ? isUpdating : isCreating;
 
   return (
     <>
       <MenuSencillo crear={rol !== 4} toggleModal={toggleModal} busqueda={busqueda} handleBusqueda={handleBusqueda} />
-      <DataTableComponent data={lista} columns={columns} loading={loading} />
+      <DataTableComponent data={lista} columns={columns} loading={isLoading} />
       <VentanaModal size={"full"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler}
         loading={loading} titulo={tituloModal} >
         <FormSolicitudes solicitud={solicitud} handleChange={handleChange} handleChangeImagen={handleChangeImagen} />

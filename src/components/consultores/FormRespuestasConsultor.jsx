@@ -3,6 +3,7 @@ import { es } from 'date-fns/locale';
 import { Label, Select, Textarea, TextInput } from 'flowbite-react';
 import { FaCheck, FaClock, FaExclamationCircle, FaHourglassEnd, FaTasks, FaUser } from 'react-icons/fa';
 import Container from '../../utils/helpers/Container';
+import SpinnerUtil from '../../utils/spinner/SpinnerUtil';
 import FilePreview from '../admins/solicitudes/FilePreview';
 
 const StatusIcon = ({ estado }) => {
@@ -17,7 +18,7 @@ const StatusIcon = ({ estado }) => {
     }
 };
 
-const RequestDetails = ({ solicitud, handleChange, prioridad }) => (
+const RequestDetails = ({ solicitud, handleChange, prioridad, loadingPrioridad }) => (
     <>
         <div className="max-w-full flex flex-col sm:flex-row sm:space-x-4 sm:mt-3">
             <div className="w-full">
@@ -43,8 +44,8 @@ const RequestDetails = ({ solicitud, handleChange, prioridad }) => (
         </div>
         <div className="max-w-full flex flex-col sm:flex-row sm:space-x-4 sm:mt-3">
             <div className="w-full flex justify-end">
-                <button onClick={prioridad} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" >
-                    Actualizar
+                <button onClick={prioridad} disabled={loadingPrioridad} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" >
+                    {loadingPrioridad ? <SpinnerUtil size={5} /> : 'Actualizar'}
                 </button>
             </div>
         </div>
@@ -92,16 +93,18 @@ const ResponseSection = ({ isClosed, puedeResponder, handleChange, solicitud, re
     </div>
 );
 
-export default function FormRespuestasConsultor(
-    { solicitud, handleChange, loading, fileUrl, personas, asignar, responder, puedeResponder, handleChangeCheckbox, changePrioridad }
-) {
+export default function FormRespuestasConsultor({
+    solicitud, handleChange, loading, fileUrl, personas, asignar, responder, puedeResponder, handleChangeCheckbox,
+    changePrioridad, loadingPrioridad, loadingAsignar
+}) {
 
     const isClosed = solicitud.estado === "CERRADA";
 
     return (
         <>
             <Container>
-                <RequestDetails solicitud={solicitud} handleChange={handleChange} prioridad={changePrioridad} />
+                <RequestDetails solicitud={solicitud} handleChange={handleChange} prioridad={changePrioridad}
+                    loadingPrioridad={loadingPrioridad} />
             </Container>
             <Container>
                 <div className="max-w-full flex flex-col sm:flex-row sm:space-x-4 sm:mt-5">
@@ -109,61 +112,71 @@ export default function FormRespuestasConsultor(
                         <Label value="Seguimiento" />
                         <StatusTimeline estados={solicitud.estados} />
                     </div>
-                    {fileUrl && (
-                        <div className="w-full">
-                            <h3 className="text-lg font-medium">Archivo adjunto:</h3>
-                            <FilePreview fileUrl={fileUrl} />
-                        </div>
-                    )}
+                    {
+                        fileUrl && (
+                            <div className="w-full">
+                                <h3 className="text-lg font-medium">Archivo adjunto:</h3>
+                                <FilePreview fileUrl={fileUrl} />
+                            </div>
+                        )
+                    }
                 </div>
             </Container>
             <Container>
                 <div className="max-w-full flex flex-col sm:flex-row sm:space-x-4 sm:my-5">
-                    {isClosed ? (
+                    {
+                        isClosed ? (
+                            <ResponseSection isClosed={isClosed} puedeResponder={puedeResponder} handleChange={handleChange}
+                                solicitud={solicitud} responder={responder} loading={loading} />
+                        ) : (
+                            <>
+                                <div className="w-full">
+                                    <div className="flex items-center">
+                                        <input type="checkbox" id="puedeResponder" checked={puedeResponder} onChange={handleChangeCheckbox}
+                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-400 rounded" />
+                                        <label htmlFor="puedeResponder" className="ms-2 text-sm font-medium text-gray-900">¿Puede responder?</label>
+                                    </div>
+                                </div>
+                            </>
+                        )
+                    }
+                </div>
+                {
+                    puedeResponder && !isClosed && (
                         <ResponseSection isClosed={isClosed} puedeResponder={puedeResponder} handleChange={handleChange}
                             solicitud={solicitud} responder={responder} loading={loading} />
-                    ) : (
-                        <>
+                    )
+                }
+                {
+                    !isClosed && !puedeResponder && (
+                        <div className="max-w-full flex flex-col sm:flex-row sm:space-x-4 sm:mt-3">
                             <div className="w-full">
-                                <div className="flex items-center">
-                                    <input type="checkbox" id="puedeResponder" checked={puedeResponder} onChange={handleChangeCheckbox}
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-400 rounded" />
-                                    <label htmlFor="puedeResponder" className="ms-2 text-sm font-medium text-gray-900">¿Puede responder?</label>
-                                </div>
+                                <Label htmlFor="responsable" value="Asignar responsable" />
+                                <Select icon={FaUser} id="responsable" name="persona"
+                                    value={solicitud.persona ? solicitud.persona.id : ''} onChange={handleChange}>
+                                    {
+                                        personas.length > 0 ? (
+                                            <>
+                                                <option value={0}>Escoja una persona...</option>
+                                                {personas.map((persona) => (
+                                                    <option key={persona.id} value={persona.id}>{persona.nombres}</option>
+                                                ))}
+                                            </>
+                                        ) : (
+                                            <option disabled>No hay personas registradas</option>
+                                        )
+                                    }
+                                </Select>
                             </div>
-                        </>
-                    )}
-                </div>
-                {puedeResponder && !isClosed && (
-                    <ResponseSection isClosed={isClosed} puedeResponder={puedeResponder} handleChange={handleChange}
-                        solicitud={solicitud} responder={responder} loading={loading} />
-                )}
-                {!isClosed && !puedeResponder && (
-                    <div className="max-w-full flex flex-col sm:flex-row sm:space-x-4 sm:mt-3">
-                        <div className="w-full">
-                            <Label htmlFor="responsable" value="Asignar responsable" />
-                            <Select icon={FaUser} id="responsable" name="persona"
-                                value={solicitud.persona ? solicitud.persona.id : ''} onChange={handleChange}>
-                                {personas.length > 0 ? (
-                                    <>
-                                        <option value={0}>Escoja una persona...</option>
-                                        {personas.map((persona) => (
-                                            <option key={persona.id} value={persona.id}>{persona.nombres}</option>
-                                        ))}
-                                    </>
-                                ) : (
-                                    <option disabled>No hay personas registradas</option>
-                                )}
-                            </Select>
+                            <div className="w-full flex items-end">
+                                <button onClick={asignar} disabled={loadingAsignar}
+                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    {loadingAsignar ? 'Cargando...' : 'Asignar'}
+                                </button>
+                            </div>
                         </div>
-                        <div className="w-full flex items-end">
-                            <button onClick={asignar} disabled={loading}
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                {loading ? 'Cargando...' : 'Guardar'}
-                            </button>
-                        </div>
-                    </div>
-                )}
+                    )
+                }
             </Container>
         </>
     );

@@ -7,7 +7,7 @@ export async function createInstitucion(institucion) {
     try {
         const res = await axios.post(URL, institucion);
         return res.data;
-    } catch (error) {        
+    } catch (error) {
         throw error;
     }
 }
@@ -40,13 +40,8 @@ export async function updateInstitucion(institucion) {
 }
 
 export async function updateLogoInstitucion(logo, id) {
-    const options = {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    };
     try {
-        const res = await axios.post(URL + "/imagen/" + id, logo, options);
+        const res = await axios.post(URL + "/imagen/" + id, logo);
         return res.data;
     } catch (error) {
         throw error;

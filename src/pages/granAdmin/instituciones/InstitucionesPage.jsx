@@ -9,27 +9,28 @@ import CardSkeleton from '../../../utils/skeletons/CardSkeleton';
 
 function InstitucionesPage() {
 
-  const { institucion, instituciones, openModal, loading, tituloModal, openModalImagen, tituloModalImagen, logo,
-    toggleModal, handleChange, handleSubmit, cargar, handleUpdate, toggleModalImage, cargarLogo, handleChangeImage,
-    cambiarImagen, eliminar } = useInstituciones();
-  const handler = institucion.id ? handleUpdate : handleSubmit;
+  const { institucion, isLoading, instituciones, openModal, tituloModal, openModalImagen, tituloModalImagen, logo,
+    isCreating, isUpdating, isUpdatingLogo, toggleModal, handleChange, handleCreate, cargar, handleUpdate, toggleModalImage,
+    cargarLogo, handleChangeImage, handleUpdateImage, handleDelete } = useInstituciones();
+  const handler = institucion.id ? handleUpdate : handleCreate;
+  const load = institucion.id ? isUpdating : isCreating;
 
   return (
     <>
       <MenuSencillo buscar={false} toggleModal={toggleModal} />
       {
-        loading ?
+        isLoading ?
           <CardSkeleton /> :
-          <CardInstituciones instituciones={instituciones} cargar={cargar} eliminar={eliminar} changeLogo={cargarLogo} />
+          <CardInstituciones instituciones={instituciones} cargar={cargar} changeLogo={cargarLogo} eliminar={handleDelete} />
       }
       {/* Modal crear y actualizar */}
-      <VentanaModal size={"full"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler}
-        loading={loading} titulo={tituloModal} >
+      <VentanaModal size={"full"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler} loading={load}
+        titulo={tituloModal} >
         <FormInstitucion institucion={institucion} handleChange={handleChange} />
       </VentanaModal>
       {/* modal cambiar imagen */}
-      <VentanaModal size={"full"} openModal={openModalImagen} cerrarModal={toggleModalImage} hanleSubmit={cambiarImagen}
-        loading={loading} titulo={tituloModalImagen} >
+      <VentanaModal size={"full"} openModal={openModalImagen} cerrarModal={toggleModalImage} hanleSubmit={handleUpdateImage}
+        titulo={tituloModalImagen} loading={isUpdatingLogo}>
         <FormImagenInstitucion handleChangeImage={handleChangeImage} />
       </VentanaModal>
     </>

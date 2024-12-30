@@ -1,4 +1,4 @@
-import useCantidad from "../hooks/useCantidad";
+import apiQueryCantidad from "../api/apiQueryCantidad";
 
 const GRAN_ADMIN_CARDS = (roles, instituciones) => [
     { color: "pink-500", cantidad: instituciones, titulo: "Instituciones", icono: "landmark" },
@@ -25,19 +25,20 @@ const PERSONA_CARDS = (solicitudes) => [
 
 export function getCardsByRole(role) {
 
-    const { roles, instituciones, solicitudes, solicitudesCerradas, solicitudesEnProceso, solicitudesPendientes } = useCantidad();
+    const { contRoles, ContInstituciones, contSolicitudes, solicitudesCerradas, solicitudesEnProceso, solicitudesPendientes
+    } = apiQueryCantidad();
 
     switch (role) {
         case 1:
-            return GRAN_ADMIN_CARDS(roles, instituciones);
+            return GRAN_ADMIN_CARDS(contRoles, ContInstituciones);
         case 2:
             return SUPER_ADMIN_CARDS();
         case 3:
-            return ADMIN_CARDS(solicitudes);
+            return ADMIN_CARDS(contSolicitudes);
         case 4:
-            return CONSULTOR_CARDS(solicitudes, solicitudesPendientes, solicitudesEnProceso, solicitudesCerradas);
+            return CONSULTOR_CARDS(contSolicitudes, solicitudesPendientes, solicitudesEnProceso, solicitudesCerradas);
         case 5:
-            return PERSONA_CARDS(solicitudes);
+            return PERSONA_CARDS(contSolicitudes);
         default:
             return null;
     }

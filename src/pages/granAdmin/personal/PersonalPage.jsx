@@ -8,15 +8,16 @@ import VentanaModal from '../../../utils/modals/VentanaModal';
 
 function PersonalPage() {
 
-  const { persona, listadoPersonal, loading, tituloModal, openModal,
-    toggleModal, handleChange, handleSubmit, handleUpdate, eliminar, cargar } = usePersonal();
+  const { persona, personas, isCreating, isLoading, isUpdating, tituloModal, openModal,
+    toggleModal, handleChange, handleSubmit, handleUpdate, handleDelete, cargar } = usePersonal();
   const handler = persona.id ? handleUpdate : handleSubmit;
-  const columns = AdminsColumn({ cargar, eliminar });
+  const loading = persona.id ? isUpdating : isCreating;
+  const columns = AdminsColumn({ cargar, handleDelete });
 
   return (
     <>
       <MenuSencillo toggleModal={toggleModal} />
-      <DataTableComponent data={listadoPersonal} columns={columns} loading={loading} />
+      <DataTableComponent data={personas} columns={columns} loading={isLoading} />
       <VentanaModal size={"full"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler}
         loading={loading} titulo={tituloModal} >
         <FormPersonal persona={persona} handleChange={handleChange} />

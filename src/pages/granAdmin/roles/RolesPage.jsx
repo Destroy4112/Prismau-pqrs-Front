@@ -8,17 +8,18 @@ import VentanaModal from '../../../utils/modals/VentanaModal';
 
 function RolesPage() {
 
-  const { tituloModal, roles, loading, openModal, rol,
-    handleChange, toggleModal, handleSubmit, cargar, handleUpdate, eliminar } = useRoles();
-  const columns = RolesColumn({ cargar, eliminar });
-  const handler = rol.id ? handleUpdate : handleSubmit;
+  const { tituloModal, roles, isLoading, openModal, rol, isCreating, isUpdating,
+    handleChange, toggleModal, handleCreate, cargar, handleUpdate, handleDelete } = useRoles();
+  const columns = RolesColumn({ cargar, handleDelete });
+  const handler = rol.id ? handleUpdate : handleCreate;
+  const load = rol.id ? isUpdating : isCreating;
 
   return (
     <>
       <MenuSencillo buscar={false} toggleModal={toggleModal} />
-      <DataTableComponent columns={columns} data={roles} loading={loading} />
-      <VentanaModal size={"2xl"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler}
-        loading={loading} titulo={tituloModal} >
+      <DataTableComponent columns={columns} data={roles} loading={isLoading} />
+      <VentanaModal size={"2xl"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler} loading={load}
+        titulo={tituloModal} >
         <FormRol rol={rol} handleChange={handleChange} />
       </VentanaModal>
     </>
