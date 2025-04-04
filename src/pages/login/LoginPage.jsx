@@ -1,8 +1,8 @@
 import React from 'react'
-import ContainerLogin from '../../components/login/ContainerLogin'
-import LogoLogin from '../../components/login/LogoLogin'
-import FormLogin from '../../components/login/FormLogin'
-import useLogin from '../../hooks/useLogin'
+import ContainerLogin from './components/ContainerLogin'
+import LogoLogin from './components/LogoLogin'
+import FormLogin from './components/FormLogin'
+import useLogin from './hooks/useLogin'
 
 function LoginPage() {
 

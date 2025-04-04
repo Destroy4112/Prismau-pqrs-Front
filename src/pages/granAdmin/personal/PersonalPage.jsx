@@ -1,27 +1,30 @@
 import React from 'react';
-import FormPersonal from '../../../components/granAdmin/personal/FormPersonal';
-import MenuSencillo from '../../../components/layouts/menu/MenuSencillo';
-import usePersonal from '../../../hooks/usePersonal';
-import { AdminsColumn } from '../../../models/columns/AdminsColumn';
-import DataTableComponent from '../../../utils/dataTable/DataTableComponent';
-import VentanaModal from '../../../utils/modals/VentanaModal';
+import DataTableComponent from '../../../components/dataTable/DataTableComponent';
+import Contenido from '../../../components/helpers/Contenido';
+import TituloPage from '../../../components/helpers/TituloPage';
+import MenuSencillo from '../../../components/menu/MenuSencillo';
+import VentanaModal from '../../../components/modals/VentanaModal';
+import FormPersonal from './components/FormPersonal';
+import { PersonaColumn } from './components/PersonaColumn';
+import usePersonal from './hooks/usePersona';
 
 function PersonalPage() {
 
-  const { persona, personas, isCreating, isLoading, isUpdating, tituloModal, openModal,
-    toggleModal, handleChange, handleSubmit, handleUpdate, handleDelete, cargar } = usePersonal();
-  const handler = persona.id ? handleUpdate : handleSubmit;
-  const loading = persona.id ? isUpdating : isCreating;
-  const columns = AdminsColumn({ cargar, handleDelete });
+  const { titulo, persona, personas, loading, isLoading, tituloModal, openModal,
+    toggleModal, handleChange, handler, handleDelete, cargar } = usePersonal();
+  const columns = PersonaColumn({ cargar, handleDelete });
 
   return (
     <>
-      <MenuSencillo toggleModal={toggleModal} />
-      <DataTableComponent data={personas} columns={columns} loading={isLoading} />
-      <VentanaModal size={"full"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler}
-        loading={loading} titulo={tituloModal} >
-        <FormPersonal persona={persona} handleChange={handleChange} />
-      </VentanaModal>
+      <TituloPage titulo={titulo} />
+      <Contenido>
+        <MenuSencillo toggleModal={toggleModal} buscar={false} />
+        <DataTableComponent data={personas} columns={columns} loading={isLoading} />
+        <VentanaModal size={"full"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler}
+          loading={loading} titulo={tituloModal} >
+          <FormPersonal persona={persona} handleChange={handleChange} />
+        </VentanaModal>
+      </Contenido>
     </>
   )
 }

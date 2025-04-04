@@ -1,20 +1,25 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import apiQueryCantidad from '../../api/apiQueryCantidad';
-import CardsDashboard from '../../components/dashboard/CardsDashboard';
-import CardsPromedioDashboard from '../../components/dashboard/CardsPromedioDashboard';
-import { getCardsByRole } from '../../models/ItemsCards';
+import { useAppSelector } from '../../hooks/useStore';
+import apiQueryCantidad from './api/apiQueryCantidad';
+import CardsDashboard from './components/CardsDashboard';
+import CardsPromedioDashboard from './components/CardsPromedioDashboard';
+import { getCardsByRole } from './components/ItemsCards';
+import TituloPage from '../../components/helpers/TituloPage';
+import Contenido from '../../components/helpers/Contenido';
 
 function DashboardPage() {
 
-  const rol = useSelector(state => state.credenciales.rol.id);
-  const items = getCardsByRole(rol)
+  const rol = useAppSelector(state => state.credenciales.rol);
+  const items = getCardsByRole(rol);
   const { promedio } = apiQueryCantidad();
 
   return (
     <>
-      <CardsDashboard items={items} />
-      {rol === 3 && <CardsPromedioDashboard promedio={promedio} />}
+      <TituloPage titulo={"Dashboard"} />
+      <Contenido>
+        <CardsDashboard items={items} />
+        {rol === 3 && <CardsPromedioDashboard promedio={promedio} />}
+      </Contenido>
     </>
   )
 }

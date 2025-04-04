@@ -1,15 +1,5 @@
-// export const RouteBack = "http://127.0.0.1:3000";
-// export const RouteBackFile = "http://127.0.0.1:3000/archivos";
-
-export const RouteBack = "https://api.prismau.com.co";
-export const RouteBackFile = "https://api.prismau.com.co/archivos";
-
 export const PublicRoutes = {
     LOGIN: '/',
-}
-
-export const granAdminRoutes = {
-    DASHBOARD: '/dashboard',
 }
 
 export const PrivateRoutes = {
@@ -21,7 +11,9 @@ export const PrivateRoutes = {
     PERSONAL: 'personal',
     ROLES: '/roles',
     SOLICITUDES: '/solicitudes',
+    SOLICITUDES_INSTITUCIONES: '/solicitudes-instituciones',
     RESPUESTA: '/respuesta',
+    RESPUESTA_CONSULTOR: '/detalle-solicitud',
 }
 
 export const HelpRoutes = {

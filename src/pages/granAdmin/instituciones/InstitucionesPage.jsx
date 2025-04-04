@@ -1,38 +1,35 @@
 import React from 'react';
-import CardInstituciones from '../../../components/granAdmin/instituciones/CardInstituciones';
-import FormImagenInstitucion from '../../../components/granAdmin/instituciones/FormImagenInstitucion';
-import FormInstitucion from '../../../components/granAdmin/instituciones/FormInstitucion';
-import MenuSencillo from '../../../components/layouts/menu/MenuSencillo';
-import useInstituciones from '../../../hooks/useInstituciones';
-import VentanaModal from '../../../utils/modals/VentanaModal';
-import CardSkeleton from '../../../utils/skeletons/CardSkeleton';
+import Contenido from '../../../components/helpers/Contenido';
+import TituloPage from '../../../components/helpers/TituloPage';
+import MenuSencillo from '../../../components/menu/MenuSencillo';
+import VentanaModal from '../../../components/modals/VentanaModal';
+import CardInstituciones from './components/CardInstituciones';
+import FormImagenInstitucion from './components/FormImagenInstitucion';
+import FormInstitucion from './components/FormInstitucion';
+import useInstitucion from './hooks/useInstitucion';
 
 function InstitucionesPage() {
 
-  const { institucion, isLoading, instituciones, openModal, tituloModal, openModalImagen, tituloModalImagen, logo,
-    isCreating, isUpdating, isUpdatingLogo, toggleModal, handleChange, handleCreate, cargar, handleUpdate, toggleModalImage,
-    cargarLogo, handleChangeImage, handleUpdateImage, handleDelete } = useInstituciones();
-  const handler = institucion.id ? handleUpdate : handleCreate;
-  const load = institucion.id ? isUpdating : isCreating;
+  const { titulo, institucion, loading, isLoading, instituciones, openModal, tituloModal, openModalImagen,
+    tituloModalImagen, toggleModal, handleChange, handler, cargar, toggleModalImage, cargarLogo, handleChangeImage,
+    handleUpdateImage, handleDelete } = useInstitucion();
 
   return (
     <>
-      <MenuSencillo buscar={false} toggleModal={toggleModal} />
-      {
-        isLoading ?
-          <CardSkeleton /> :
-          <CardInstituciones instituciones={instituciones} cargar={cargar} changeLogo={cargarLogo} eliminar={handleDelete} />
-      }
-      {/* Modal crear y actualizar */}
-      <VentanaModal size={"full"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler} loading={load}
-        titulo={tituloModal} >
-        <FormInstitucion institucion={institucion} handleChange={handleChange} />
-      </VentanaModal>
-      {/* modal cambiar imagen */}
-      <VentanaModal size={"full"} openModal={openModalImagen} cerrarModal={toggleModalImage} hanleSubmit={handleUpdateImage}
-        titulo={tituloModalImagen} loading={isUpdatingLogo}>
-        <FormImagenInstitucion handleChangeImage={handleChangeImage} />
-      </VentanaModal>
+      <TituloPage titulo={titulo} />
+      <Contenido>
+        <MenuSencillo buscar={false} toggleModal={toggleModal} />
+        <CardInstituciones instituciones={instituciones} cargar={cargar} changeLogo={cargarLogo}
+          eliminar={handleDelete} loading={isLoading} />
+        <VentanaModal size={"full"} openModal={openModal} cerrarModal={toggleModal} hanleSubmit={handler} loading={loading}
+          titulo={tituloModal} >
+          <FormInstitucion institucion={institucion} handleChange={handleChange} />
+        </VentanaModal>
+        <VentanaModal size={"full"} openModal={openModalImagen} cerrarModal={toggleModalImage} hanleSubmit={handleUpdateImage}
+          titulo={tituloModalImagen} loading={loading}>
+          <FormImagenInstitucion handleChangeImage={handleChangeImage} />
+        </VentanaModal>
+      </Contenido>
     </>
   );
 }

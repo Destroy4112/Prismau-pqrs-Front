@@ -17,7 +17,7 @@ const LinkAside = React.memo(function LinkAside({ menu, activeSubroutes }) {
 
     return (
         <li>
-            <NavLink to={menu.link} replace={true} className={`flex items-center p-2 text-${menu.color}-${menu.opacidad} rounded-lg dark:text-white hover:bg-green-300 dark:hover:bg-green-400 group ${isActive() ? 'active' : ''}`}            >
+            <NavLink to={menu.link} replace={true} className={`flex items-center p-2 text-${menu.color}-${menu.opacidad} rounded-lg dark:text-white hover:bg-green-300 dark:hover:bg-green-400 group ${isActive() ? 'activo' : ''}`}            >
                 <i className={`fa fa-${menu.icono} flex-shrink-0 w-5 text-xl mr-4 transition duration-75 dark:group-hover:text-white`}></i>
                 <span className="flex-1 ms-3 mt-1 whitespace-nowrap">{menu.texto}</span>
             </NavLink>

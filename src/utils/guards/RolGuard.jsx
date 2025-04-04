@@ -1,21 +1,20 @@
-import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
-import { PrivateRoutes } from "../../models/RutasModel";
+import { useAppSelector } from "../../hooks/useStore";
+import { HelpRoutes } from "../../models/RoutesModel";
 
-const prohibido = <Navigate replace to={PrivateRoutes.PAGE403} />;
+const prohibido = <Navigate replace to={HelpRoutes.PAGE403} />;
 
 export const SuperadminGuard = () => {
-    const rol = useSelector((state) => state.credenciales.Rol);
-    return rol == 0 ? <Outlet /> : prohibido;
+    const rol = useAppSelector((state) => state.credenciales.rol);
+    return rol === "SuperAdmin" ? <Outlet /> : prohibido;
 }
 
 export const AdminGuard = () => {
-    const rol = useSelector((state) => state.credenciales.Rol);
-    return (rol == 1 || rol == 0) ? <Outlet /> : prohibido;
+    const rol = useAppSelector((state) => state.credenciales.rol);
+    return (rol === "Administrador") ? <Outlet /> : prohibido;
 }
 
-export const SocioGuard = () => {
-    const rol = useSelector((state) => state.credenciales.Rol);
-    return rol == 2 || rol == 3 ? <Outlet /> : prohibido;
+export const ConsultorGuard = () => {
+    const rol = useAppSelector((state) => state.credenciales.rol);
+    return (rol === "Persona" || rol === "Consultor") ? <Outlet /> : prohibido;
 }
-

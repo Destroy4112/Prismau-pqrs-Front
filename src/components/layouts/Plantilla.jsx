@@ -1,22 +1,23 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import { initFlowbite } from "flowbite";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import useLogin from "../../hooks/useLogin";
+import { useAppSelector } from "../../hooks/useStore";
+import useLogin from "../../pages/login/hooks/useLogin";
 import Sidebar from "./aside/Sidebar";
 import ContainerContenido from "./content/ContainerContenido";
 import Navbar from "./nav/Navbar";
 
 function Plantilla() {
 
-    const usuario = useSelector((state) => state.user);
-    const credenciales = useSelector((state) => state.credenciales);
-    const { openAside, openNav, toggleAside, toggleNav, logout } = useLogin();
+    const usuario = useAppSelector((state) => state.user);
+    const credenciales = useAppSelector((state) => state.credenciales);
+    const { logout } = useLogin();
+    useEffect(() => { initFlowbite(); }, []);
 
     return (
         <>
-            <Navbar toggleAside={toggleAside} toggleNav={toggleNav} open={openNav} logout={logout}
-                credenciales={credenciales} usuario={usuario} />
-            <Sidebar open={openAside} />
+            <Navbar logout={logout} credenciales={credenciales} usuario={usuario} />
+            <Sidebar usuario={usuario} rol={credenciales.rol} />
             <ContainerContenido>
                 <Outlet />
             </ContainerContenido>
