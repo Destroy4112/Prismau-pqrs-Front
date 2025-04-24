@@ -4,7 +4,7 @@ import { createSolicitud, getSolicitudes, updateSolicitud } from "./solicitud.se
 export default function apiQuerySolicitud() {
 
     const queryClient = useAppQueryClient();
-    const id = useAppSelector(state => state.institucion.id);
+    const id = useAppSelector(state => state.user.id);
 
     //=========== CREAR ==============================
 

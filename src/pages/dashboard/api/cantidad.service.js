@@ -43,7 +43,7 @@ export async function getCantidadSolicitudesConsultor(id) {
 
 export async function getCantidadSolicitudesInstitucion(id) {
     try {
-        const res = await api.get(URL_SOLICITUD + "/institucion/cantidad/" + id);
+        const res = await api.get(URL_SOLICITUD + "/admin/cantidad/" + id);
         return res.data;
     } catch (error) {
         throw error;

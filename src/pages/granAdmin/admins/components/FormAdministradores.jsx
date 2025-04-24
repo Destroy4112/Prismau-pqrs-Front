@@ -1,6 +1,6 @@
 import { Label, Select, TextInput } from 'flowbite-react';
 import React from 'react';
-import { FaEnvelope, FaIdCard, FaKeyboard, FaMercury, FaPhoneAlt } from 'react-icons/fa';
+import { FaCodeBranch, FaEnvelope, FaIdCard, FaKeyboard, FaMercury, FaPhoneAlt } from 'react-icons/fa';
 
 function FormAdministradores({ admin, handleChange }) {
 
@@ -56,6 +56,13 @@ function FormAdministradores({ admin, handleChange }) {
                 </div>
             </div>
             <div className="max-w-full flex flex-col sm:flex-row sm:space-x-4 sm:mt-3">
+                <div className="w-full">
+                    <div className="mb-2 block">
+                        <Label htmlFor="area" value="Area" />
+                    </div>
+                    <TextInput id="area" type="text" icon={FaCodeBranch} onChange={handleChange}
+                        value={admin.area} name='area' placeholder="Ingrese el area..." />
+                </div>
                 <div className="w-full">
                     <div className="mb-2 block">
                         <Label htmlFor="telefono" value="Teléfono" />

@@ -18,7 +18,7 @@ function DashboardPage() {
       <TituloPage titulo={"Dashboard"} />
       <Contenido>
         <CardsDashboard items={items} />
-        {rol === 3 && <CardsPromedioDashboard promedio={promedio} />}
+        {rol === "Administrador" && <CardsPromedioDashboard promedio={promedio} />}
       </Contenido>
     </>
   )

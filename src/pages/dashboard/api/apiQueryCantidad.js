@@ -5,7 +5,6 @@ import { getCantidadInstituciones, getCantidadSolicitudesConsultor, getCantidadS
 export default function apiQueryCantidad() {
 
     const rol = useAppSelector(state => state.credenciales.rol);
-    const institucion = useAppSelector(state => state.institucion);
     const usuario = useAppSelector(state => state.user);
 
     const { data: ContInstituciones } = useAppQuery({
@@ -14,10 +13,10 @@ export default function apiQueryCantidad() {
     });
 
     const { data: contSolicitudes } = useAppQuery({
-        queryKey: ['contSolicitudes', rol, institucion.id, usuario.id],
+        queryKey: ['contSolicitudes', rol, usuario.id],
         queryFn: async () => {
             if (rol === "Administrador") {
-                return await getCantidadSolicitudesInstitucion(institucion.id);
+                return await getCantidadSolicitudesInstitucion(usuario.id);
             } else if (rol === "Consultor") {
                 return await getCantidadSolicitudesConsultor(usuario.id);
             } else {
@@ -40,8 +39,8 @@ export default function apiQueryCantidad() {
     });
 
     const { data: promedio } = useAppQuery({
-        queryKey: ['promedio', institucion.id],
-        queryFn: () => getPromedioSolicitudesInstitucion(institucion.id),
+        queryKey: ['promedio', usuario.id],
+        queryFn: () => getPromedioSolicitudesInstitucion(usuario.id),
         enabled: rol === "Administrador",
     });
 

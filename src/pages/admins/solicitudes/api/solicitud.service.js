@@ -14,7 +14,7 @@ export async function createSolicitud(solicitud) {
 
 export async function getSolicitudes(id) {
     try {
-        const res = await api.get(URL + "/institucion/" + id);
+        const res = await api.get(URL + "/admin/" + id);
         return res.data;
     } catch (error) {
         throw error;

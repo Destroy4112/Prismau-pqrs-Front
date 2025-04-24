@@ -21,6 +21,7 @@ export default function useAdministrador() {
         email: "",
         telefono: "",
         foto: null,
+        area: "",
         institucion_id: institucion.id,
         rol: "Administrador"
     });
@@ -36,6 +37,7 @@ export default function useAdministrador() {
             email: "",
             telefono: "",
             foto: null,
+            area: "",
             institucion_id: institucion.id,
             rol: "Administrador"
         });
