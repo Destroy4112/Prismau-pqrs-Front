@@ -1,5 +1,5 @@
 import { useAppMutation, useAppQuery, useAppQueryClient, useAppSelector } from "../../../../hooks/useStore";
-import { asignPersonaSolicitud, cambiarPrioridad, getSolicitudes, getSolicitudesPersona, responderSolicitud } from "./solicitud.service";
+import { asignPersonaSolicitud, cambiarPrioridad, getSolicitudes, getSolicitudesPersona, responderSolicitud, setEnProceso } from "./solicitud.service";
 
 export default function apiQuerySolicitud() {
 
@@ -28,6 +28,13 @@ export default function apiQuerySolicitud() {
         onSuccess: () => queryClient.refetchQueries({ queryKey: ['solicitudes'] }),
     });
 
+    //=========== EN PROCESO ==============================
+
+    const { mutate: enProcesoMutation } = useAppMutation({
+        mutationFn: setEnProceso,
+        onSuccess: () => queryClient.refetchQueries({ queryKey: ['solicitudes'] }),
+    });
+
     //=========== ASIGNAR RESPONSABLE ==============================
 
     const { mutate: responsableSolicitudMutation, isPending: isAsigning } = useAppMutation({
@@ -38,7 +45,7 @@ export default function apiQuerySolicitud() {
     //=========== RESPONDER ==============================
 
     const { mutate: responderSolicitudMutation, isPending: isResponding } = useAppMutation({
-        mutationFn: responderSolicitud,
+        mutationFn: ({ id, solicitud }) => responderSolicitud(id, solicitud),
         onSuccess: () => queryClient.refetchQueries({ queryKey: ['solicitudes'] }),
     });
 
@@ -48,8 +55,9 @@ export default function apiQuerySolicitud() {
         isChangingPriority,
         isAsigning,
         isResponding,
+        enProcesoMutation,
         prioridadSolicitudMutation,
         responsableSolicitudMutation,
-        responderSolicitudMutation
+        responderSolicitudMutation,
     }
 }

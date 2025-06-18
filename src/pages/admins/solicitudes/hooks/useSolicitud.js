@@ -147,7 +147,7 @@ export default function useSolicitud(soli) {
         busqueda,
         handleBusqueda,
         setSolicitud,
-        toggleModal,
+        toggleModal: abrirModal,
         handleChange,
         handleChangeImagen,
         handler: solicitud.id ? handleUpdate : handleSubmit,

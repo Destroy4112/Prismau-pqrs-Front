@@ -1,5 +1,5 @@
 import { Label, Textarea, TextInput } from 'flowbite-react';
-import { FaExclamationCircle, FaEye, FaTasks } from 'react-icons/fa';
+import { FaCheckSquare, FaExclamationCircle, FaEye, FaTasks } from 'react-icons/fa';
 import Caja from '../../../../components/helpers/Caja';
 import EstadosSolicitud from './EstadosSolicitud';
 import FilePreview from './FilePreview';
@@ -61,13 +61,21 @@ export default function FormRespuestas({ solicitud, fileUrl }) {
                     )}
                 </div>
                 <div className="max-w-full flex flex-col sm:flex-row sm:space-x-4 sm:mt-3">
-                    {solicitud.respuesta && (
+                    {solicitud.respuesta ? (
                         <div className="w-full">
                             <div className="mb-2 block">
                                 <Label htmlFor="respuesta2" value="Respuesta" />
                             </div>
                             <Textarea id="respuesta2" type="text" value={solicitud.respuesta} name='respuesta'
                                 disabled />
+                        </div>
+                    ) : (
+                        <div className="w-full text-center py-8">
+                            <FaCheckSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                            <p className="text-gray-500">Aún no hay respuesta para esta solicitud</p>
+                            <p className="text-sm text-gray-400 mt-1">
+                                Recibirás una notificación cuando haya una respuesta disponible
+                            </p>
                         </div>
                     )}
                 </div>

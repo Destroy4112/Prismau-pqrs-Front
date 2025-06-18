@@ -1,11 +1,7 @@
 import { FaCalendarAlt, FaClipboardCheck, FaCog, FaExclamationCircle, FaEye, FaFileAlt, FaLandmark, FaListOl, FaTasks } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import { PrivateRoutes } from "../../../../models/RoutesModel";
 import { formatearFecha } from "../../../../utils/convertidores/converter";
 
-export const SolicitudesColumn = () => {
-
-    const navigate = useNavigate();
+export const SolicitudesColumn = ({ goToRespuesta }) => {
 
     const color = (estado) => {
         return estado == "PENDIENTE" ? 'yellow-400' : estado == 'EN PROCESO' ? 'blue-500' : 'green-500';
@@ -32,7 +28,7 @@ export const SolicitudesColumn = () => {
                 <FaCog /> Acciones
             </div>),
             selector: row => (
-                <button onClick={() => navigate(PrivateRoutes.RESPUESTA_CONSULTOR, { state: { solicitud: row } })} className='flex items-center justify-center rounded-full w-8 h-8 bg-blue-700 text-white hover:bg-white hover:text-blue-700 hover:border hover:border-blue-700' title='Editar'>
+                <button onClick={() => goToRespuesta(row)} className='flex items-center justify-center rounded-full w-8 h-8 bg-blue-700 text-white hover:bg-white hover:text-blue-700 hover:border hover:border-blue-700' title='Editar'>
                     <FaEye />
                 </button>
             ),

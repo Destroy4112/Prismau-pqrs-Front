@@ -1,4 +1,3 @@
-import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Contenido from '../../../components/helpers/Contenido';
 import TituloPage from '../../../components/helpers/TituloPage';

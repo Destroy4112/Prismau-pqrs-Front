@@ -12,9 +12,10 @@ export default function useSolicitud(soli) {
     const navigate = useNavigate();
     const { openModal, toggleModal } = useModal();
     const { isAsigning, isChangingPriority, isLoading, isResponding, solicitudes, responderSolicitudMutation,
-        prioridadSolicitudMutation, responsableSolicitudMutation } = apiQuerySolicitud();
+        prioridadSolicitudMutation, responsableSolicitudMutation, enProcesoMutation } = apiQuerySolicitud();
 
     const [fileUrl, setFileUrl] = useState('');
+    const [fileRespuestaUrl, setFileRespuestaUrl] = useState('');
     const [busqueda, setBusqueda] = useState("");
     const [puedeResponder, setPuedeResponder] = useState(false);
     const [solicitud, setSolicitud] = useState(soli || {
@@ -24,7 +25,8 @@ export default function useSolicitud(soli) {
         archivo: "",
         estado: "PENDIENTE",
         usuario: 1,
-        respuesta: null
+        respuesta: null,
+        respuesta_Archivo: null
     });
 
     /*================= RECARGAR ============================== */
@@ -33,7 +35,10 @@ export default function useSolicitud(soli) {
         if (solicitud.archivo) {
             setFileUrl(`${URL_ARCHIVOS}${solicitud.archivo}`);
         }
-    }, [solicitud.archivo]);
+        if(solicitud.respuesta_Archivo) {
+            setFileRespuestaUrl(`${URL_ARCHIVOS}${solicitud.respuesta_Archivo}`);
+        }
+    }, [solicitud.archivo, solicitud.respuesta_Archivo]);
 
     const recargar = () => {
         setSolicitud({
@@ -93,6 +98,16 @@ export default function useSolicitud(soli) {
         });
     }
 
+    /*================= En proceso ============================== */
+
+    const goToRespuesta = (solicitud) => {
+        if (solicitud.estado === "PENDIENTE") {
+            solicitud.estado = "EN PROCESO";
+            enProcesoMutation(solicitud.id, { onSuccess: () => { alertSucces("Solicitud en proceso"); } });
+        }
+        navigate(PrivateRoutes.RESPUESTA_CONSULTOR, { state: { solicitud } })
+    }
+
     /*================= Asignar responsable ============================== */
 
     const asignarPersona = (e) => {
@@ -112,13 +127,23 @@ export default function useSolicitud(soli) {
 
     /*================= Responder solicitud ============================== */
 
+    const handleChangeFile = (event) => {
+        const file = event.target.files[0];
+        setSolicitud({ ...solicitud, respuesta_Archivo: file })
+    };
+
     const handleCheckboxChange = () => {
         setPuedeResponder(!puedeResponder);
     };
 
     const responder = (e) => {
         e.preventDefault();
-        responderSolicitudMutation(solicitud, {
+        const formData = new FormData();
+        if (solicitud.respuesta_Archivo) {
+            formData.append('respuesta_Archivo', solicitud.respuesta_Archivo);
+        }
+        formData.append('respuesta', solicitud.respuesta);
+        responderSolicitudMutation({ id: solicitud.id, solicitud: formData }, {
             onSuccess: (data) => {
                 if (data.status) {
                     alertSucces(data.message);
@@ -141,6 +166,7 @@ export default function useSolicitud(soli) {
         openModal,
         solicitud,
         fileUrl,
+        fileRespuestaUrl,
         puedeResponder,
         busqueda,
         handleChange,
@@ -148,7 +174,9 @@ export default function useSolicitud(soli) {
         handleCheckboxChange,
         setSolicitud,
         toggleModal,
+        goToRespuesta,
         asignarPersona,
+        handleChangeFile,
         responder,
         changePrioridad,
     }

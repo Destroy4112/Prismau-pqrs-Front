@@ -1,4 +1,3 @@
-import React from 'react';
 import DataTableComponent from '../../../components/dataTable/DataTableComponent';
 import Contenido from '../../../components/helpers/Contenido';
 import TituloPage from '../../../components/helpers/TituloPage';
@@ -8,8 +7,8 @@ import useSolicitud from './hooks/useSolicitud';
 
 export default function SolicitudesConsultorPage() {
 
-  const { titulo, busqueda, isLoading, lista, handleAsignar, handleBusqueda } = useSolicitud();
-  const columns = SolicitudesColumn();
+  const { titulo, busqueda, isLoading, lista, handleAsignar, handleBusqueda, goToRespuesta } = useSolicitud();
+  const columns = SolicitudesColumn({ goToRespuesta });
 
   return (
     <>

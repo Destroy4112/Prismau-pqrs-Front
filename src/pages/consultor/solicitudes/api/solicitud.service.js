@@ -30,6 +30,15 @@ export async function cambiarPrioridad(solicitud) {
     }
 }
 
+export async function setEnProceso(solicitud) {
+    try {
+        const res = await api.put(URL + "/en-proceso/" + solicitud, {});
+        return res.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export async function asignPersonaSolicitud(solicitud) {
     try {
         const res = await api.put(URL + "/" + solicitud.id, solicitud);
@@ -39,9 +48,9 @@ export async function asignPersonaSolicitud(solicitud) {
     }
 }
 
-export async function responderSolicitud(solicitud) {
+export async function responderSolicitud(id, solicitud) {
     try {
-        const res = await api.put(URL + "/respuesta/" + solicitud.id, solicitud);
+        const res = await api.put(URL + "/respuesta/" + id, solicitud);
         return res.data;
     } catch (error) {
         throw error;
